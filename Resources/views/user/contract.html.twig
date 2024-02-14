@@ -1,0 +1,38 @@
+{% extends "user/contract.html.twig" %}
+
+
+{% block form_content %}
+
+    {% form_theme form 'form/horizontal.html.twig' %}
+
+    {{ form_row(form._token) }}
+
+    <fieldset class="form-fieldset form-fieldset-light">
+        <legend>General</legend>
+        <div class="form-text mb-3 help-text">Allgemeine Informationen</div>
+        {{ form_row(form.workStartingDay) }}
+    </fieldset>
+
+    <fieldset class="form-fieldset form-fieldset-light">
+        <legend>{{ 'work_times_should'|trans }}</legend>
+        <div class="form-text mb-3 help-text">{{ 'work_times_should.help'|trans  }}</div>
+        {{ form_row(form.workHoursMonday) }}
+        {{ form_row(form.workHoursTuesday) }}
+        {{ form_row(form.workHoursWednesday) }}
+        {{ form_row(form.workHoursThursday) }}
+        {{ form_row(form.workHoursFriday) }}
+        {{ form_row(form.workHoursSaturday) }}
+        {{ form_row(form.workHoursSunday) }}
+    </fieldset>
+
+    <fieldset class="form-fieldset form-fieldset-light">
+        <legend>Urlaub</legend>
+        <div class="form-text mb-3 help-text">Die Anzahl der Urlaubstage im Jahr</div>
+        {{ form_row(form.holidaysPerYear) }}
+    </fieldset>
+
+    <fieldset class="form-fieldset form-fieldset-light">
+        {{- form_rest(form) -}}
+    </fieldset>
+
+{% endblock %}

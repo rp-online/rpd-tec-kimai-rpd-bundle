@@ -1,0 +1,21 @@
+{
+  "name": "rp-online/rpd-tec-kimai-rpd-bundle",
+  "description": "Custom kimai plugin for RPD needs",
+  "homepage": "https://rp-online.de/",
+  "type": "kimai-plugin",
+  "version": "0.1",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Florian Frohn",
+      "email": "florian.frohn@rp-digital.de",
+      "homepage": "https://rp-online.de"
+    }
+  ],
+  "extra": {
+    "kimai": {
+      "require": 20000,
+      "name": "RPD Bundle"
+    }
+  }
+}
