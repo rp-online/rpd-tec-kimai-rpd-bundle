@@ -24,10 +24,10 @@ class SprintReportForm extends AbstractType
         $this->addActivitySelect($builder, [], true, true, false);
         $this->addUsersChoice($builder);
         $builder->add('hasTicket', ChoiceType::class, [
-            'label' => 'Hat Tickets',
+            'label' => 'Tickets',
             'choices' => [
-                'Ja' => true,
-                'Nein' => false
+                'Nur auf Tickets gebuchte Zeiten' => true,
+                'Alle Zeiten' => false
             ]
         ]);
         $builder->add('plan', TextType::class, [

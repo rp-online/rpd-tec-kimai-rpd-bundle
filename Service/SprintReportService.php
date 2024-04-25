@@ -55,6 +55,7 @@ class SprintReportService
     {
         $result = [
             'stats' => $this->getDailyStatistics($timeSheets, $query),
+            'timesheets' => $timeSheets,
             'dataType' => 'duration',
             'period_attribute' => 'days',
             'subReportRoute' => 'report_user_week',
@@ -120,8 +121,10 @@ class SprintReportService
     {
         $result = [];
         $sheets = [];
+        $users = [];
         /** @var Timesheet $timeSheet */
         foreach($timeSheets as $timeSheet) {
+            $users[$timeSheet->getUser()->getId()] = $timeSheet->getUser();
             $name = $timeSheet->getUser()->getName();
             $year = $timeSheet->getBegin()->format('Y');
             $month = $timeSheet->getBegin()->format('n');
@@ -142,6 +145,9 @@ class SprintReportService
             }
         }
         foreach($query->getUsers() as $user) {
+            $users[$user->getId()] = $user;
+        }
+        foreach($users as $user) {
             $statistics = new DailyStatistic($query->getBegin(), $query->getEnd(), $user);
             foreach($statistics->getDays() as $day) {
                 if(!empty($sheets[$user->getName()][$day->getDate()->format('Y')][$day->getDate()->format('n')][$day->getDate()->format('d')])) {
@@ -194,7 +200,7 @@ class SprintReportService
                 ->andWhere(
                     $timesheetQueryBuilder->expr()->in('p.customer', ':customers')
                 )
-                ->setParameter('customers', implode(',', $customerIdArray));
+                ->setParameter('customers', $customerIdArray);
         }
     }
 
@@ -208,7 +214,7 @@ class SprintReportService
             $timesheetQueryBuilder->andWhere(
                 $timesheetQueryBuilder->expr()->in('t.project', ':projects')
             )
-                ->setParameter('projects', implode(',', $projectIdArray));
+                ->setParameter('projects', $projectIdArray);
         }
     }
 
@@ -222,7 +228,7 @@ class SprintReportService
             $timesheetQueryBuilder->andWhere(
                 $timesheetQueryBuilder->expr()->in('t.activity', ':activities')
             )
-                ->setParameter('activities', implode(',', $activityIdArray));
+                ->setParameter('activities', $activityIdArray);
         }
     }
 
@@ -236,7 +242,7 @@ class SprintReportService
             $timesheetQueryBuilder->andWhere(
                 $timesheetQueryBuilder->expr()->in('t.user', ':users')
             )
-                ->setParameter('users', implode(',', $userIdArray));
+                ->setParameter('users', $userIdArray);
         }
     }
 
