@@ -107,7 +107,7 @@ class TimesheetSubscriber implements EventSubscriberInterface
         }
     }
 
-    public function createWorklog(string $jiraUrl, string $jiraUsername, string $jiraPassword, TimesheetCreatePostEvent|TimesheetUpdatePostEvent $event, int $ticket): void
+    public function createWorklog(string $jiraUrl, string $jiraUsername, string $jiraPassword, TimesheetCreatePostEvent|TimesheetUpdatePostEvent $event, string $ticket): void
     {
         if (!empty($jiraUrl) && !empty($jiraUsername) && !empty($jiraPassword)) {
             $body = [
