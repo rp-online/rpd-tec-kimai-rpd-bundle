@@ -331,9 +331,9 @@ class SprintReportService
         }
         foreach ($doughnut['values'] as &$value) {
             if ($value['value'] != 1) {
-                $value['duration'] = $this->convertSeconds($value['value']);
+                $value['duration'] = $this->getTotalHoursAndMinutes($value['value']);
             } else {
-                $value['duration'] = $this->convertSeconds($value['value']);
+                $value['duration'] = $this->getTotalHoursAndMinutes($value['value']);
             }
         }
         return $doughnut;
