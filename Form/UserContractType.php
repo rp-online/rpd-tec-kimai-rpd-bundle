@@ -34,7 +34,6 @@ class UserContractType extends AbstractType
             ->add('workHoursFriday', DurationType::class, array_merge(['label' => 'Friday'], $dayOptions))
             ->add('workHoursSaturday', DurationType::class, array_merge(['label' => 'Saturday'], $dayOptions))
             ->add('workHoursSunday', DurationType::class, array_merge(['label' => 'Sunday'], $dayOptions))
-            ->add('holidaysPerYear', IntegerType::class, ['label' => 'Urlaubstage p.a.'])
             ->add('workStartingDay', DatePickerType::class, ['label' => 'Beschäftigt seit'])
         ;
     }

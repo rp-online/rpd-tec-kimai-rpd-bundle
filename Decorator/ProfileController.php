@@ -5,6 +5,7 @@ namespace KimaiPlugin\RPDBundle\Decorator;
 use App\Entity\User;
 use App\Repository\UserRepository;
 use KimaiPlugin\RPDBundle\Form\UserContractType;
+use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
