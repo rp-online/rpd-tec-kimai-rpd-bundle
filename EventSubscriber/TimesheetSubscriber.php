@@ -63,10 +63,12 @@ class TimesheetSubscriber implements EventSubscriberInterface
         $jiraPassword = $user?->getPreference('jira_password')?->getValue();
         $jiraUrl = $this->systemConfiguration->find('jira.url');
         $ticket = $event->getTimesheet()->getMetaField('ticket')?->getValue();
-        if (!empty($worklogId)) {
-            $this->updateWorklog($jiraUrl, $jiraUsername, $jiraPassword, $ticket, $event, $worklogId);
-        } else {
-            $this->createWorklog($jiraUrl, $jiraUsername, $jiraPassword, $event, $ticket);
+        if(!empty($ticket)) {
+            if (!empty($worklogId)) {
+                $this->updateWorklog($jiraUrl, $jiraUsername, $jiraPassword, $ticket, $event, $worklogId);
+            } else {
+                $this->createWorklog($jiraUrl, $jiraUsername, $jiraPassword, $event, $ticket);
+            }
         }
     }
 
