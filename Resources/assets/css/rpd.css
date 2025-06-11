@@ -1,3 +1,27 @@
 table.vacation td, table.vacation thead th {
     text-align: center;
 }
+
+.navbar.navbar-vertical {
+    background-color: #2A2E36;
+}
+.navbar {
+    --tblr-navbar-active-border-color: #FFCC00;
+}
+
+.navbar-brand {
+    margin-top: 5px;
+}
+
+.navbar-brand img {
+    display: none;
+}
+
+.navbar-brand a {
+    background-image: url('https://api.rp-online.de/assets/logo.svg');
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-position: center;
+    width: 100%;
+    height: 30px;
+}
