@@ -79,22 +79,22 @@
                 }
             }
         </script>
-        <div  class="mt-5">
-            {{ form_start(team_overview.add_form) }}
-                <div class="d-flex justify-content-between">
-                    <div class="me-3" style="min-width: 200px;">
-                        {{ form_row(team_overview.add_form.user) }}
-                    </div>
-                    {{ form_row(team_overview.add_form.start, {'attr': {'class': 'me-3'}}) }}
-                    {{ form_row(team_overview.add_form.end, {'attr': {'class': 'me-3'}}) }}
-                    <div class="me-3" style="margin-top: 36px;">
-                        {{ form_row(team_overview.add_form.approved) }}
-                    </div>
-                    <div style="margin-top: 28px;">
-                        {{ form_row(team_overview.add_form.submit) }}
-                    </div>
-                </div>
-            {{ form_end(team_overview.add_form) }}
-        </div>
     </div>
 {% endfor %}
+<div  class="mt-5">
+    {{ form_start(team_overview.add_form) }}
+    <div class="d-flex justify-content-between">
+        <div class="me-3" style="min-width: 200px;">
+            {{ form_row(team_overview.add_form.user) }}
+        </div>
+        {{ form_row(team_overview.add_form.start, {'attr': {'class': 'me-3'}}) }}
+        {{ form_row(team_overview.add_form.end, {'attr': {'class': 'me-3'}}) }}
+        <div class="me-3" style="margin-top: 36px;">
+            {{ form_row(team_overview.add_form.approved) }}
+        </div>
+        <div style="margin-top: 28px;">
+            {{ form_row(team_overview.add_form.submit) }}
+        </div>
+    </div>
+    {{ form_end(team_overview.add_form) }}
+</div>
