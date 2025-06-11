@@ -1,0 +1,16 @@
+Hallo {{ vacation.user.displayName }},
+
+Ein Urlaub wurde für dich hinzugefügt.
+
+Details:
+- **Startdatum:** {{ vacation.start|date('d.m.Y') }}
+- **Enddatum:** {{ vacation.end|date('d.m.Y') }}
+- **Anzahl Tage:** {{ getVacationDuration(vacation) }}
+- **Genehmigt:** {{ vacation.approved ? 'Ja' : 'Nein' }}
+
+Bitte beachte diese Änderung in deinem Urlaubskonto.
+
+Vielen Dank
+
+--
+Hinweis: Diese Email wurde automatisch generiert!

@@ -1,0 +1,16 @@
+Hallo {{ vacation.user.displayName }},
+
+Dein Urlaubsantrag wurde leider abgelehnt.
+
+Details:
+- **Startdatum:** {{ vacation.start|date('d.m.Y') }}
+- **Enddatum:** {{ vacation.end|date('d.m.Y') }}
+- **Anzahl Tage:** {{ getVacationDuration(vacation) }}
+- **Grund:** {{ vacation.declineReason }}
+
+Bitte wende dich bei Rückfragen an deine Teamleitung.
+
+Vielen Dank
+
+--
+Hinweis: Diese Email wurde automatisch generiert!

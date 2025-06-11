@@ -1,0 +1,15 @@
+Hallo Teamleitung,
+
+{{ vacation.user.displayName }} hat einen neuen Urlaubsantrag gestellt.
+
+Details:
+- **Startdatum:** {{ vacation.start|date('d.m.Y') }}
+- **Enddatum:** {{ vacation.end|date('d.m.Y') }}
+- **Anzahl Tage:** {{ getVacationDuration(vacation) }}
+
+Bitte prüfe den Antrag im System.
+
+Vielen Dank
+
+--
+Hinweis: Diese Email wurde automatisch generiert!

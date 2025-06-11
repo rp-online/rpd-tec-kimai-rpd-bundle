@@ -30,9 +30,9 @@ class UserPreferenceSubscriber implements EventSubscriberInterface
         $event->addPreference(
             (new UserPreference('jira_password', ''))
                 ->setOrder(900)
-                ->setType(PasswordType::class)
+                ->setType(TextType::class)
                 ->setEnabled(true)
-                ->setOptions(['help' => 'Jira password for jira connection', 'label' => 'Jira: Password'])
+                ->setOptions(['help' => 'Jira API Key for jira connection. You can manage the api keys here: https://id.atlassian.com/manage-profile/security/api-tokens', 'label' => 'Jira: API Key'])
                 ->setSection('jira')
         );
     }

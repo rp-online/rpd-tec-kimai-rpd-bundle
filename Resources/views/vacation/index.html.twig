@@ -1,0 +1,41 @@
+{% extends 'page_setup.html.twig' %}
+{% import "macros/widgets.html.twig" as widgets %}
+
+
+{% block main %}
+{#    {{ dump() }}#}
+    <div class="row">
+        <div class="col-12">
+            <div class="card mb-3">
+                <div class="card-body">
+                    <h5 class="card-title border-bottom pb-2">Urlaubskalendar</h5>
+                    <div class="card-text">
+                        {% include '@RPD/vacation/partials/calendar.html.twig' %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-12{% if me.hasTeamleadRole() %} col-xxl-6{% endif %}">
+            <div class="card mb-3">
+                <div class="card-body">
+                    <h5 class="card-title border-bottom pb-2">Meine Urlaubsübersicht</h5>
+                    <div class="card-text">
+                        {% include '@RPD/vacation/partials/overview.html.twig' %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% if me.hasTeamleadRole() %}
+            <div class="col-12 col-xxl-6">
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <h5 class="card-title border-bottom pb-2">Team-Übersicht</h5>
+                        <div class="card-text">
+                            {% include '@RPD/vacation/partials/team.html.twig' %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+{% endblock %}

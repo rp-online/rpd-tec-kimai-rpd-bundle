@@ -1,0 +1,15 @@
+Hallo {{ vacation.user.displayName }},
+
+Dein Urlaubsantrag wurde von {{ vacation.approvedBy.displayName }} genehmigt.
+
+Details:
+- **Startdatum:** {{ vacation.start|date('d.m.Y') }}
+- **Enddatum:** {{ vacation.end|date('d.m.Y') }}
+- **Anzahl Tage:** {{ getVacationDuration(vacation) }}
+
+Wir wünschen dir eine erholsame Zeit!
+
+Vielen Dank
+
+--
+Hinweis: Diese Email wurde automatisch generiert!

@@ -1,0 +1,100 @@
+{% for team in team_overview.teams %}
+    <div class="mb-3">
+        <h4>{{ team.label }}</h4>
+        <h5>Urlaubsübersicht der Teammitglieder</h5>
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th class="text-center">Urlaubstage pro Jahr</th>
+                        <th class="text-center">Genommener Urlaub</th>
+                        <th class="text-center">Noch nicht freigegebener Urlaub</th>
+                        <th class="text-center">Verbleibender Urlaub</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for member in team.members %}
+                        <tr>
+                            <th>{{ member.user.displayName }}</th>
+                            <td class="text-center">{{ member.user.holidaysPerYear }} {% if member.user.holidaysPerYear == 1 %}Tag{% else %}Tage{% endif %}</td>
+                            <td class="text-center">{{ member.taken }} {% if member.taken == 1 %}Tag{% else %}Tage{% endif %}</td>
+                            <td class="text-center">{{ member.open }} {% if member.open == 1 %}Tag{% else %}Tage{% endif %}</td>
+                            {% set remaining = member.user.holidaysPerYear - (member.taken + member.open) %}
+                            <td class="fw-bold text-center {% if remaining >= 0 %}text-success{% else %}text-danger{% endif %}">
+                                {{ remaining }} {% if remaining == 1 %}Tag{% else %}Tage{% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% if team.open_requests %}
+            <h5 class="mt-5">Offene Anträge</h5>
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th class="text-center">Start</th>
+                            <th class="text-center">Ende</th>
+                            <th class="text-center">Dauer</th>
+                            <th class="text-center">Hinweise</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for vacation in team.open_requests %}
+                            <tr>
+                                <th>{{ vacation.user.displayName }}</th>
+                                <td class="text-center">{{ vacation.start|date('d.m.Y') }}</td>
+                                <td class="text-center">{{ vacation.end|date('d.m.Y') }}</td>
+                                <td class="text-center">
+                                    {{ getVacationDuration(vacation) }}
+                                </td>
+                                <td class="text-center"><small class="text-warning">{{ vacation.notes|nl2br }}</small></td>
+                                <td class="text-end">
+                                    {% set approve_form = team_overview.approve_form.createView()  %}
+                                    {{ form_start(approve_form) }}
+                                    {{ form_widget(approve_form.vacationId, {'attr': {'value': vacation.id}}) }}
+                                    {{ form_widget(approve_form.reason, {'attr': {'data-reason': vacation.id}}) }}
+                                    {{ form_widget(approve_form.approve) }}
+                                    {{ form_widget(approve_form.decline, {'attr': { 'onclick': 'setHiddenFieldValue(' ~ vacation.id ~ ')' }}) }}
+                                    {{ form_end(approve_form) }}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% endif %}
+        <script>
+            function setHiddenFieldValue(targetId) {
+                // Open a prompt dialog and get the user's input
+                const userInput = prompt("Bitte begründe, warum du den Antrag ablehnst:");
+
+                // If the user entered a value, set it in the hidden field
+                if (userInput !== null) {
+                    document.querySelector('[data-reason="' + targetId + '"]').value = userInput;
+                }
+            }
+        </script>
+        <div  class="mt-5">
+            {{ form_start(team_overview.add_form) }}
+                <div class="d-flex justify-content-between">
+                    <div class="me-3" style="min-width: 200px;">
+                        {{ form_row(team_overview.add_form.user) }}
+                    </div>
+                    {{ form_row(team_overview.add_form.start, {'attr': {'class': 'me-3'}}) }}
+                    {{ form_row(team_overview.add_form.end, {'attr': {'class': 'me-3'}}) }}
+                    <div class="me-3" style="margin-top: 36px;">
+                        {{ form_row(team_overview.add_form.approved) }}
+                    </div>
+                    <div style="margin-top: 28px;">
+                        {{ form_row(team_overview.add_form.submit) }}
+                    </div>
+                </div>
+            {{ form_end(team_overview.add_form) }}
+        </div>
+    </div>
+{% endfor %}

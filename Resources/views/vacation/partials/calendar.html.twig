@@ -1,0 +1,90 @@
+{% set currentDate = year|date('Y-m-d')|date('Y-m-01') %}
+{% set currentYear = currentDate|date('Y') %}
+{% set today = 'now'|date('d-m-Y') %}
+
+<div class="mb-3">
+    {{ form_start(calendar_year_form, {'attr': {'onchange': 'this.submit()'}}) }}
+    {{ form_widget(calendar_year_form.date) }}
+    {{ form_end(calendar_year_form) }}
+</div>
+
+<div class="table-responsive">
+    <table class="table vacation">
+        <thead>
+        <tr>
+            <th style="width: 5%;"></th>
+            {% set days = ['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So'] %}
+            {% for i in 0..max_days %}
+                <th style="width: {{ 95/(max_days + 1) }}%">{{ days[i % 7] }}</th>
+            {% endfor %}
+        </tr>
+        </thead>
+
+        <tbody>
+            {% for month in 1..12 %}
+                <tr>
+                    {% set firstDayOfMonth = currentDate|date_modify((currentYear ~ '-' ~ month ~ '-01')) %}
+                    {% set daysInMonth = firstDayOfMonth|date('t') %}
+                    {% set startDay = firstDayOfMonth|date('N') %}
+                    {% set cnt = 0 %}
+                    <th>{{ firstDayOfMonth|date('M') }}</th>
+
+                    {# Leere Zellen für Tage vor dem 1. des Monats #}
+                    {% if startDay > 1 %}
+                        {% for i in 1..(startDay - 1) %}
+                            {% set cnt = cnt + 1 %}
+                            <td{% if cnt%7 == 6 or cnt%7 == 0 %} class="bg-body-tertiary"{% endif %} data-cnt="{{ cnt }}"></td>
+                        {% endfor %}
+                    {% endif %}
+
+                    {# Tage des Monats #}
+                    {% for day in 1..daysInMonth %}
+                        {% set cnt = cnt + 1 %}
+                        {% set currentDate = firstDayOfMonth|date_modify('+' ~ (day - 1) ~ ' days') %}
+                        {% set timestamp = currentDate.timestamp %}
+                        {% if isPublicHoliday(currentDate) %}
+                            <td class="text-white fw-bold{% if currentDate.format('d-m-Y') == today %} bg-info-subtle{% elseif cnt%7 == 6 or cnt%7 == 0 %} bg-body-tertiary{% endif %}"><div class="bg-info" data-toggle="tooltip" data-bs-title="{{ getPublicHolidayLabel(currentDate) }}" data-bs-html="true">{{ day }}</div></td>
+                        {% else %}
+                            <td class="{% if currentDate.format('d-m-Y') == today %}bg-info-subtle{% elseif cnt%7 == 6 or cnt%7 == 0 %}bg-body-tertiary{% endif %}" data-cnt="{{ cnt }}">
+                                {% if all_vacations[timestamp] is defined %}
+                                    <div style="position: relative" data-toggle="tooltip" data-bs-title="{{ all_vacations[timestamp]['users']|join('<br />') }}" data-bs-html="true">
+                                        <div class="d-flex align-items-stretch border rounded" style="min-height: 20px;">
+                                            {% for color in all_vacations[timestamp]['colors'] %}
+                                                <div style="background-color: {{ color }}; min-height: 3px; width: 100%;"></div>
+                                            {% endfor %}
+                                        </div>
+                                        <div class="fw-bold" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: white;">{{ day }}</div>
+                                    </div>
+                                {% else %}
+                                    {{ day }}
+                                {% endif %}
+                            </td>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% if cnt <= max_days %}
+                        {# Leere Zellen für Tage nach dem letzten Tag des Monats #}
+                        {% for i in cnt..max_days %}
+                            <td{% if (i + 1)%7 == 6 or (i + 1)%7 == 0 %} class="bg-body-tertiary"{% endif %} data-cnt="{{ i }}"></td>
+                        {% endfor %}
+                    {% endif %}
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+<div class="mt-5">
+    <h4>Legende</h4>
+    <div class="d-flex">
+        <div class="d-flex align-items-center me-3 mb-2 border bg-light rounded p-2">
+            <div class="me-2 bg-info" style="width: 20px; height: 20px;"></div>
+            <span>Feiertag</span>
+        </div>
+        {% for user in all_users %}
+            <div class="d-flex align-items-center me-3 mb-2 border bg-light rounded p-2">
+                <div class="me-2" style="width: 20px; height: 20px; background-color: {{ user.color }};"></div>
+                <span>{{ user.name }}</span>
+            </div>
+        {% endfor %}
+    </div>
+</div>

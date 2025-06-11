@@ -1,0 +1,69 @@
+<div class="d-flex justify-content-between">
+    <div>
+        <h4>Gesamter Urlaub</h4>
+        <p class="text-center fw-bold">{{ holiday_infos.holidays_per_year }} {% if holiday_infos.holidays_per_year == 1 %}Tag{% else %}Tage{% endif %}</p>
+    </div>
+    <div>
+        <h4>Genommener Urlaub</h4>
+        <p class="text-center fw-bold">{{ holiday_infos.already_taken }} {% if holiday_infos.already_taken == 1 %}Tag{% else %}Tage{% endif %}</p>
+    </div>
+    <div>
+        <h4>Noch nicht freigegeben</h4>
+        <p class="text-center fw-bold">{{ holiday_infos.pending }} {% if holiday_infos.pending == 1 %}Tag{% else %}Tage{% endif %}</p>
+    </div>
+    <div>
+        <h4>Verbleibender Urlaub</h4>
+        {% set remaining = holiday_infos.holidays_per_year - (holiday_infos.already_taken + holiday_infos.pending) %}
+        <p class="text-center fw-bold {% if remaining >= 0 %}text-success{% else %}text-danger{% endif %}">{{ remaining }} {% if remaining == 1 %}Tag{% else %}Tage{% endif %}</p>
+    </div>
+</div>
+
+<div class="mt-4 table-responsive">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Startdatum</th>
+                <th>Enddatum</th>
+                <th>Dauer</th>
+                <th>Status</th>
+                <th>Genehmigt von</th>
+                <th>Genehmigt am</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for vacation in holiday_infos.current_vacations %}
+            <tr>
+                <td>{{ vacation.start|date('d.m.Y') }}</td>
+                <td>{{ vacation.end|date('d.m.Y') }}</td>
+                <td>
+                    {{ getVacationDuration(vacation) }}
+                </td>
+                <td>{% if vacation.approved %}<span class="fw-bold text-success">Genehmigt</span>{% elseif vacation.declined %}<p class="fw-bold text-danger mb-1">Abgelehnt</p><small><b>Begründung:</b> {{ vacation.declineReason }}</small>{% else %}<span class="fw-bold text-info">Ausstehend</span>{% endif %}</td>
+                <td>{% if vacation.approvedBy %}{{ vacation.approvedBy.displayName }}{% endif %}</td>
+                <td>{% if vacation.approvedAt %}{{ vacation.approvedAt|date('d.m.Y') }}{% endif %}</td>
+                <td class="text-end">
+                    {% if not vacation.declined and vacation.end.timestamp > date().timestamp %}
+                        {% set revoke_form = holiday_infos.vacation_revoke_form.createView()  %}
+                        {{ form_start(revoke_form) }}
+                            {{ form_widget(revoke_form.vacationId, {'attr': {'value': vacation.id}}) }}
+                            {{ form_widget(revoke_form.submit) }}
+                        {{ form_end(revoke_form) }}
+                    {% endif %}
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<div class="mt-4">
+    <h4>Urlaub beantragen</h4>
+    {{ form_start(holiday_infos.vacation_request_form) }}
+    <div class="d-flex justify-content-between">
+        {{ form_row(holiday_infos.vacation_request_form.start, {'attr': {'class': 'me-2'}}) }}
+        {{ form_row(holiday_infos.vacation_request_form.end, {'attr': {'class': 'me-2'}}) }}
+        {{ form_row(holiday_infos.vacation_request_form.submit, {'attr': {'style': 'margin-top: 28px;'}}) }}
+    </div>
+    {{ form_end(holiday_infos.vacation_request_form) }}
+</div>
