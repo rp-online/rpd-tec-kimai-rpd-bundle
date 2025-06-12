@@ -127,7 +127,7 @@ class VacationController extends AbstractController
         if (!empty($this->publicHolidays[$date->format('Y')])) {
             return;
         }
-        $file = $this->kernel->getCacheDir() . '/public_holidays.json';
+        $file = $this->kernel->getCacheDir() . '/public_holidays_' . $date->format('Y') . '.json';
         if (!file_exists($file)) {
             $client = HttpClient::create();
             $response = $client->request('GET', 'https://feiertage-api.de/api/?jahr=' . $date->format('Y') . '&nur_land=NW');
