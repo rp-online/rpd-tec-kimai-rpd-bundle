@@ -1,0 +1,18 @@
+Hallo zusammen,
+
+hiermit würde ich gerne folgenden Urlaub beantragen:
+
+{% set startDate = vacation.start|date('d.m.Y') %}
+{% set endDate = vacation.end|date('d.m.Y') %}
+Urlaub: {{ startDate }}{% if endDate != startDate%} – {{ endDate }}{% endif %}
+
+Anzahl: {{ getVacationDuration(vacation) }}
+
+Firma: {{ company }}
+Team: {{ vacation.user.preference('team').value }}
+Kostenstelle: {{ vacation.user.preference('cost_center').value }}
+Name: {{ vacation.user.displayName }}
+Personal-Nr.: {{ vacation.user.accountNumber }}
+
+Liebe Grüße,
+{{ vacation.user.displayName }}

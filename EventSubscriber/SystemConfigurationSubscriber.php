@@ -29,8 +29,12 @@ class SystemConfigurationSubscriber implements EventSubscriberInterface
 
         $vacationProblemThresholdConfiguration = new Configuration('vacation.problem_threshold');
         $vacationProblemThresholdConfiguration->setLabel('Schwellenwert für parallele Urlaube')->setType(NumberType::class)->setOptions(['help' => 'Definiert die maximale Anzahl an sich überschneidenden Urlauben, bevor dies als potenzielles Problem betrachtet wird.']);
+
+        $vacationHREMail = new Configuration('vacation.hr_email_address');
+        $vacationHREMail->setLabel('E-Mail-Adresse für Urlaubsmail an HR')->setType(TextType::class)->setOptions(['help' => 'Diese E-Mail-Adresse wird verwendet, um HR über Urlaubsanträge zu informieren.']);
+
         $vacationSystemConfiguration = new SystemConfiguration('Urlaub');
-        $vacationSystemConfiguration->setConfiguration([$vacationProblemThresholdConfiguration]);
+        $vacationSystemConfiguration->setConfiguration([$vacationProblemThresholdConfiguration, $vacationHREMail]);
         $event->addConfiguration($vacationSystemConfiguration);
     }
 

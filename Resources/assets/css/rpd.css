@@ -25,3 +25,7 @@ table.vacation td, table.vacation thead th {
     width: 100%;
     height: 30px;
 }
+
+h1.navbar-brand a > span {
+    display: none;
+}

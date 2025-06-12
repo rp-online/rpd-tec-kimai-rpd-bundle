@@ -2,6 +2,7 @@
 
 namespace KimaiPlugin\RPDBundle\Vacation;
 
+use App\Configuration\SystemConfiguration;
 use App\Entity\User;
 use KimaiPlugin\RPDBundle\Entity\Vacation;
 use Symfony\Component\Mailer\MailerInterface;
@@ -11,7 +12,11 @@ use Twig\Environment;
 class VacationMailer
 {
 
-    public function __construct(private readonly Environment $twig, private readonly MailerInterface $mailer)
+    public function __construct(
+        private readonly Environment $twig,
+        private readonly MailerInterface $mailer,
+        private readonly SystemConfiguration $systemConfiguration
+    )
     {
     }
 
@@ -67,7 +72,7 @@ class VacationMailer
         if(!empty($leads)) {
             $email->cc(...$leads);
         }
-
+        $this->sendInfoMailToHR($vacation);
         $this->mailer->send($email);
     }
 
@@ -111,6 +116,25 @@ class VacationMailer
         if(!empty($leads)) {
             $email->cc(...$leads);
         }
+
+        $this->mailer->send($email);
+    }
+
+    protected function sendInfoMailToHR(Vacation $vacation): void
+    {
+        $hrEmail = $this->systemConfiguration->find('vacation.hr_email_address');
+        if(empty($hrEmail) || empty($vacation->getUser()->getAccountNumber())) {
+            return;
+        }
+        $content = $this->twig->render('@RPD/mail/vacation_information.txt.twig', [
+            'vacation' => $vacation,
+            'company' => $this->systemConfiguration->find('theme.branding.company')]
+        );
+        $email = (new Email())
+            ->from('info@park.works')
+            ->to($hrEmail)
+            ->subject('Urlaubsantrag von ' . $vacation->getUser()->getDisplayName())
+            ->text($content);
 
         $this->mailer->send($email);
     }
