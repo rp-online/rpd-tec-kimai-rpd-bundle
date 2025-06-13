@@ -2,12 +2,6 @@
 {% set currentYear = currentDate|date('Y') %}
 {% set today = 'now'|date('d-m-Y') %}
 
-<div class="mb-3">
-    {{ form_start(calendar_year_form, {'attr': {'onchange': 'this.submit()'}}) }}
-    {{ form_widget(calendar_year_form.date) }}
-    {{ form_end(calendar_year_form) }}
-</div>
-
 <div class="table-responsive">
     <table class="table vacation">
         <thead>

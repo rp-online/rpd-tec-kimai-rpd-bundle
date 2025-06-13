@@ -132,7 +132,8 @@ class VacationMailer
         );
         $email = (new Email())
             ->from('info@park.works')
-            ->to($hrEmail)
+            ->cc($vacation->getUser()->getEmail())
+            ->to(...explode(',', $hrEmail))
             ->subject('Urlaubsantrag von ' . $vacation->getUser()->getDisplayName())
             ->text($content);
 

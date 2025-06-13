@@ -56,11 +56,14 @@ class VacationController extends AbstractController
         list($relevantUsers, $allVacationDays) = $this->getCalendarInformation($currentUser, $vacationRepository, $date);
 
         $page = new PageSetup('Urlaub');
-        $holidayInformation = $this->getHolidayInformation($currentUser, $vacationRepository, $request, $entityManager);
+        $page->setActionName('overview');
+        $page->setActionPayload(['year' => $date]);
+        $page->setPaginationForm($form);
+        $holidayInformation = $this->getHolidayInformation($currentUser, $vacationRepository, $request, $entityManager, $date);
         if (!is_array($holidayInformation)) {
             return $holidayInformation; // Response from holiday information form submission
         }
-        $teamOverview = $this->getTeamOverview($currentUser, $vacationRepository, $request, $entityManager);
+        $teamOverview = $this->getTeamOverview($currentUser, $vacationRepository, $request, $entityManager, $date);
         if (!is_array($teamOverview)) {
             return $teamOverview; // Response from team overview form submission
         }
@@ -149,9 +152,9 @@ class VacationController extends AbstractController
         }
     }
 
-    protected function getHolidayInformation(User $user, VacationRepository $vacationRepository, Request $request, EntityManagerInterface $entityManager): array|Response
+    protected function getHolidayInformation(User $user, VacationRepository $vacationRepository, Request $request, EntityManagerInterface $entityManager, \DateTime $currentYear): array|Response
     {
-        $this->loadPublicHoliday(new \DateTime());
+        $this->loadPublicHoliday($currentYear);
         $result = [
             'holidays_per_year' => $user->getHolidaysPerYear()
         ];
@@ -166,7 +169,7 @@ class VacationController extends AbstractController
                     $this->vacationMailer->sendVacationRevoked($vacationToRemove);
                     $entityManager->remove($vacationToRemove);
                     $entityManager->flush();
-                    $this->flashSuccess('action.remove.success');
+                    $this->flashSuccess('Urlaub erfolgreich widerrufen!');
                     return $this->redirectToRoute('vacation_overview');
                 }
             }
@@ -180,24 +183,24 @@ class VacationController extends AbstractController
             if ($vacationRequestForm->isValid()) {
                 $newVacation = $vacationRequestForm->getData();
                 if ($newVacation->getStart() > $newVacation->getEnd()) {
-                    $this->flashError('action.create.error.start_after_end');
+                    $this->flashError('Fehler: Das Startdatum muss vor dem Enddatum liegen!');
                 } else if ($vacationRepository->checkIfOverlapped($newVacation->getStart(), $newVacation->getEnd(), $user)) {
-                    $this->flashError('action.create.error.overlapped');
+                    $this->flashError('Fehler: An einem der Tage hast du bereits Urlaub genommen! Bitte passe deine Tage an!');
                 } else {
                     $newVacation->setUser($user);
                     $entityManager->persist($newVacation);
                     $entityManager->flush();
                     $this->vacationMailer->sendNewVacationRequest($newVacation);
-                    $this->flashSuccess('action.create.success');
+                    $this->flashSuccess('Urlaub erfolgreich beantragt!');
                     return $this->redirectToRoute('vacation_overview');
                 }
             } else {
-                $this->flashError('action.create.error');
+                $this->flashError('Fehler: Da ist etwas schief gelaufen! Bitte überprüfe deine Eingaben.');
             }
         }
         $result['vacation_request_form'] = $vacationRequestForm->createView();
 
-        $result['current_vacations'] = $vacationRepository->findByUser($user, (new \DateTime())->format('Y'));
+        $result['current_vacations'] = $vacationRepository->findByUser($user, $currentYear->format('Y'));
         $days = 0;
         $notApprovedDays = 0;
         $alreadyNoticed = [];
@@ -225,9 +228,9 @@ class VacationController extends AbstractController
         return $result;
     }
 
-    protected function getTeamOverview(User $user, VacationRepository $vacationRepository, Request $request, EntityManagerInterface $entityManager): array|Response
+    protected function getTeamOverview(User $user, VacationRepository $vacationRepository, Request $request, EntityManagerInterface $entityManager, \DateTime $currentYear): array|Response
     {
-        $this->loadPublicHoliday(new \DateTime());
+        $this->loadPublicHoliday($currentYear);
         $teamOverview = [];
         $approveForm = $this->createForm(VacationApproveForm::class);
         $approveForm->handleRequest($request);
@@ -241,12 +244,12 @@ class VacationController extends AbstractController
                         $approvedOrDeclinedVacation->setApprovedAt(new \DateTimeImmutable());
                         $approvedOrDeclinedVacation->setApprovedBy($user);
                         $this->vacationMailer->sendVacationApproved($approvedOrDeclinedVacation);
-                        $this->flashSuccess('action.approve.success');
+                        $this->flashSuccess('Antrag genehmigt');
                     } else {
                         $approvedOrDeclinedVacation->setDeclined(true);
                         $approvedOrDeclinedVacation->setDeclineReason($data['reason'] ?? '');
                         $this->vacationMailer->sendVacationDeclined($approvedOrDeclinedVacation);
-                        $this->flashSuccess('action.decline.success');
+                        $this->flashSuccess('Antrag abgelehnt');
                     }
                     $entityManager->persist($approvedOrDeclinedVacation);
                     $entityManager->flush();
@@ -262,9 +265,9 @@ class VacationController extends AbstractController
             /** @var Vacation $newVacation */
             $newVacation = $addForm->getData();
             if ($newVacation->getStart() > $newVacation->getEnd()) {
-                $this->flashError('action.create.error.start_after_end');
+                $this->flashError('Fehler: Das Startdatum muss vor dem Enddatum liegen!');
             } else if ($vacationRepository->checkIfOverlapped($newVacation->getStart(), $newVacation->getEnd(), $newVacation->getUser())) {
-                $this->flashError('action.create.error.overlapped');
+                $this->flashError('Fehler: An einem der Tage hast du bereits Urlaub genommen! Bitte passe deine Tage an!');
             } else {
                 if ($newVacation->isApproved()) {
                     $newVacation->setApprovedAt(new \DateTimeImmutable());
@@ -273,7 +276,7 @@ class VacationController extends AbstractController
                 $entityManager->persist($newVacation);
                 $entityManager->flush();
                 $this->vacationMailer->sendVacationAdded($newVacation);
-                $this->flashSuccess('action.create.success');
+                $this->flashSuccess('Urlaub erfolgreich hinzugefügt!');
                 return $this->redirectToRoute('vacation_overview');
             }
         }
@@ -291,7 +294,7 @@ class VacationController extends AbstractController
                 if ($member->getUser() === $user) {
                     continue;
                 }
-                $vacations = $vacationRepository->findByUser($member->getUser(), (new \DateTime())->format('Y'));
+                $vacations = $vacationRepository->findByUser($member->getUser(), $currentYear->format('Y'));
                 $taken = 0;
                 $open = 0;
                 $noticedDates = [];
