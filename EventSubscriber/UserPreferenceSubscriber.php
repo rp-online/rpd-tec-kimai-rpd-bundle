@@ -45,19 +45,23 @@ class UserPreferenceSubscriber implements EventSubscriberInterface
                 'choices' => [
                     'Tech & Services' => 'Tech & Services'
                 ],
-                'label' => 'Teamzugehörigkeit',
-                'help' => 'Wähle deine Teamzugehörigkeit aus. DIes ist relevant für die Urlaubsanträge und die Abwesenheitsplanung.',
+                'label' => 'Abteilung',
+                'help' => 'Wähle deine Abteilung aus. Dies ist relevant für die Urlaubsanträge und die Abwesenheitsplanung.',
             ])
             ->setSection('general')
         );
         $event->addPreference(
             (new UserPreference('cost_center', ))
             ->setOrder(100)
-            ->setType(TextType::class)
+            ->setType(ChoiceType::class)
             ->setEnabled(true)
             ->setOptions([
-                'label' => 'Kostenstelle',
-                'help' => 'Gib deine Kostenstelle an. Im Zweifel kannst du diese bei deinem Vorgesetzten erfragen.',
+                'label' => 'Team',
+                'help' => 'Wähle dein Team aus. Dies ist relevant für die Urlaubsanträge und die Abwesenheitsplanung.',
+                'choices' => [
+                    'Development' => '1013-3050',
+                    'PMO' => '1013-3040'
+                ],
             ])
             ->setSection('general')
         );

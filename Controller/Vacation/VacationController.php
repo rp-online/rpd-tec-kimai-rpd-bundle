@@ -291,9 +291,6 @@ class VacationController extends AbstractController
                 'open_requests' => []
             ];
             foreach ($team->getMembers() as $member) {
-                if ($member->getUser() === $user) {
-                    continue;
-                }
                 $vacations = $vacationRepository->findByUser($member->getUser(), $currentYear->format('Y'));
                 $taken = 0;
                 $open = 0;
