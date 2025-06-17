@@ -59,11 +59,15 @@
 
 <div class="mt-4">
     <h4>Urlaub beantragen</h4>
-    {{ form_start(holiday_infos.vacation_request_form) }}
-    <div class="d-flex justify-content-between">
-        {{ form_row(holiday_infos.vacation_request_form.start, {'attr': {'class': 'me-2'}}) }}
-        {{ form_row(holiday_infos.vacation_request_form.end, {'attr': {'class': 'me-2'}}) }}
-        {{ form_row(holiday_infos.vacation_request_form.submit, {'attr': {'style': 'margin-top: 28px;'}}) }}
+    <div class="row">
+        <div class="col-12 col-md-8 col-lg-7 col-xl-6 col-xxl-4">
+            {{ form_start(holiday_infos.vacation_request_form) }}
+            <div class="d-flex justify-content-between">
+                {{ form_row(holiday_infos.vacation_request_form.start, {'attr': {'class': 'me-2'}}) }}
+                {{ form_row(holiday_infos.vacation_request_form.end, {'attr': {'class': 'me-2'}}) }}
+                {{ form_row(holiday_infos.vacation_request_form.submit, {'attr': {'style': 'margin-top: 28px;'}}) }}
+            </div>
+            {{ form_end(holiday_infos.vacation_request_form) }}
+        </div>
     </div>
-    {{ form_end(holiday_infos.vacation_request_form) }}
 </div>

@@ -69,13 +69,13 @@
 </div>
 <div class="mt-5">
     <h4>Legende</h4>
-    <div class="d-flex">
-        <div class="d-flex align-items-center me-3 mb-2 border bg-light rounded p-2">
-            <div class="me-2 bg-info" style="width: 20px; height: 20px;"></div>
+    <div class="row">
+        <div class="col-3 col-md-2 col-lg-1 d-flex align-items-center me-3 mb-2 border bg-light rounded p-2">
+            <div class="me-2 bg-info p-2"></div>
             <span>Feiertag</span>
         </div>
         {% for user in all_users %}
-            <div class="d-flex align-items-center me-3 mb-2 border bg-light rounded p-2">
+            <div class="col-3 col-md-2 col-lg-1 d-flex align-items-center me-3 mb-2 border bg-light rounded p-2">
                 <div class="me-2" style="width: 20px; height: 20px; background-color: {{ user.color }};"></div>
                 <span>{{ user.name }}</span>
             </div>
