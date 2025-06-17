@@ -76,7 +76,7 @@
         </div>
         {% for user in all_users %}
             <div class="col-3 col-md-2 col-lg-1 d-flex align-items-center me-3 mb-2 border bg-light rounded p-2">
-                <div class="me-2" style="width: 20px; height: 20px; background-color: {{ user.color }};"></div>
+                <div class="me-2 p-2" style="background-color: {{ user.color }};"></div>
                 <span>{{ user.name }}</span>
             </div>
         {% endfor %}
