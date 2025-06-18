@@ -29,3 +29,23 @@ table.vacation td, table.vacation thead th {
 h1.navbar-brand a > span {
     display: none;
 }
+
+[data-bs-theme=dark] {
+    --tblr-primary: #FFCC00;
+    --tblr-primary-rgb: 255, 204, 0;
+    --tblr-body-bg: #22242b;
+    --tblr-bg-surface: #2a2d36;
+    --tblr-bg-forms: var(--tblr-body-bg);
+    --tblr-bg-surface-secondary: var(--tblr-bg-surface);
+    --tblr-bg-surface-tertiary: var(--tblr-bg-surface);
+    --tblr-muted: #7a7a7a;
+    --tblr-active-bg: #202020;
+    --tblr-dark-mode-border-color: var(--tblr-muted);
+    --tblr-primary-fg: var(--tblr-body-bg);
+    --tblr-link-color: var(--tblr-primary);
+    --tblr-link-color-rgb: var(--tblr-primary-rgb);
+}
+
+[data-bs-theme=dark] .pagination {
+    --tblr-pagination-active-color: var(--tblr-body-bg);
+}

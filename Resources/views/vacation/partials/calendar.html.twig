@@ -70,14 +70,18 @@
 <div class="mt-5">
     <h4>Legende</h4>
     <div class="row">
-        <div class="col-3 col-md-2 col-lg-1 d-flex align-items-center me-3 mb-2 border bg-light rounded p-2">
-            <div class="me-2 bg-info p-2"></div>
-            <span>Feiertag</span>
+        <div class="col-3 col-md-2 col-lg-1 mb-2">
+            <div class="d-flex justify-content-start border badge text-bg-secondary p-2">
+                <div class="me-2 bg-info p-2"></div>
+                <span>Feiertag</span>
+            </div>
         </div>
         {% for user in all_users %}
-            <div class="col-3 col-md-2 col-lg-1 d-flex align-items-center me-3 mb-2 border bg-light rounded p-2">
-                <div class="me-2 p-2" style="background-color: {{ user.color }};"></div>
-                <span>{{ user.name }}</span>
+            <div class="col-3 col-md-2 col-lg-1 mb-2">
+                <div class="d-flex justify-content-start border badge text-bg-secondary p-2">
+                    <div class="me-2 p-2" style="background-color: {{ user.color }};"></div>
+                    <span>{{ user.name }}</span>
+                </div>
             </div>
         {% endfor %}
     </div>
