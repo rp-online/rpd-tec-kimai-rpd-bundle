@@ -12,57 +12,26 @@ namespace KimaiPlugin\RPDBundle\Twig\Runtime;
 use DateInterval;
 use DatePeriod;
 use KimaiPlugin\RPDBundle\Entity\Vacation;
+use KimaiPlugin\RPDBundle\Vacation\PublicHoliday;
 use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Twig\Extension\RuntimeExtensionInterface;
 
 class VacationExtensionRuntime implements RuntimeExtensionInterface
 {
-    private static array $publicHolidays = [];
 
-    public function __construct(private readonly KernelInterface $kernel)
+    public function __construct(private readonly PublicHoliday $publicHoliday)
     {
     }
 
     public function isPublicHoliday(\DateTime $date): bool
     {
-        $this->loadPublicHoliday($date);
-
-        return !empty(self::$publicHolidays[$date->format('Y')][$date->format('Y-m-d')]);
+        return $this->publicHoliday->isPublicHoliday($date);
     }
 
     public function getPublicHolidayLabel(\DateTime $date): string
     {
-        $this->loadPublicHoliday($date);
-
-        return self::$publicHolidays[$date->format('Y')][$date->format('Y-m-d')];
-    }
-
-    protected function loadPublicHoliday(\DateTime $date): void
-    {
-        if(!empty(self::$publicHolidays[$date->format('Y')])) {
-            return;
-        }
-        $file = $this->kernel->getCacheDir() . '/public_holidays_' . $date->format('Y') . '.json';
-        if(!file_exists($file)) {
-            $client = HttpClient::create();
-            $response = $client->request('GET', 'https://feiertage-api.de/api/?jahr=' . $date->format('Y') . '&nur_land=NW');
-            $content = $response->getContent();
-            file_put_contents($file, $content);
-        } else {
-            $content = file_get_contents($file);
-        }
-        if($content !== false) {
-            $holidays = @json_decode($content, true);
-
-            if(is_array($holidays)) {
-                foreach($holidays as $name => $holiday) {
-                    if(!empty($holiday['datum'])) {
-                        self::$publicHolidays[$date->format('Y')][$holiday['datum']] = $name;
-                    }
-                }
-            }
-        }
+        return $this->publicHoliday->getPublicHolidayLabel($date);
     }
 
     public function getVacationDuration(Vacation $vacation)
@@ -76,8 +45,7 @@ class VacationExtensionRuntime implements RuntimeExtensionInterface
         $result = 0;
         /** @var \DateTime $date */
         foreach ($period as $date) {
-            $this->loadPublicHoliday($date);
-            if($vacation->getUser()->getWorkHoursForDay($date) <= 0 || !empty(self::$publicHolidays[$date->format('Y')][$date->format('Y-m-d')])) {
+            if($vacation->getUser()->getWorkHoursForDay($date) <= 0 || $this->publicHoliday->isPublicHoliday($date)) {
                 continue;
             }
             $result++;

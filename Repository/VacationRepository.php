@@ -38,6 +38,16 @@ class VacationRepository extends ServiceEntityRepository
             ->getQuery()->getResult();
     }
 
+    public function findAllByUserExcept(Vacation $vacation)
+    {
+        return $this->createQueryBuilder('v')
+            ->andWhere('v.user = :user AND YEAR(v.end) = :year AND v.declined = 0 AND v.id != :vacationId')
+            ->setParameter('year', $vacation->getStart()->format('Y'))
+            ->setParameter('user', $vacation->getUser())
+            ->setParameter('vacationId', $vacation->getId(), ParameterType::INTEGER)
+            ->getQuery()->getResult();
+    }
+
     public function findForUsers(array $users, int $year)
     {
         return $this->createQueryBuilder('v')

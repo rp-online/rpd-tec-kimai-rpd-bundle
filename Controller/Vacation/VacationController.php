@@ -15,10 +15,10 @@ use KimaiPlugin\RPDBundle\Form\VacationRequestForm;
 use KimaiPlugin\RPDBundle\Form\VacationRevokeForm;
 use KimaiPlugin\RPDBundle\Form\VacationYearSelectionForm;
 use KimaiPlugin\RPDBundle\Repository\VacationRepository;
+use KimaiPlugin\RPDBundle\Vacation\PublicHoliday;
 use KimaiPlugin\RPDBundle\Vacation\VacationAnalyzer;
 use KimaiPlugin\RPDBundle\Vacation\VacationMailer;
 use KimaiPlugin\RPDBundle\Vacation\VacationYear;
-use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\KernelInterface;
@@ -28,12 +28,11 @@ use Symfony\Component\Routing\Annotation\Route;
 class VacationController extends AbstractController
 {
 
-    private array $publicHolidays = [];
-
     public function __construct(
         private readonly KernelInterface $kernel,
         private readonly VacationMailer $vacationMailer,
-        private readonly VacationAnalyzer $vacationAnalyzer
+        private readonly VacationAnalyzer $vacationAnalyzer,
+        private readonly PublicHoliday $publicHoliday
     )
     {
     }
@@ -75,7 +74,7 @@ class VacationController extends AbstractController
             'year' => $date,
             'max_days' => $this->getMaxDaysNumber($date),
             'all_vacations' => $allVacationDays,
-            'public_holidays' => $this->publicHolidays[$date->format('Y')] ?? [],
+            'public_holidays' => $this->publicHoliday->getAll($date),
             'me' => $currentUser,
             'all_users' => $relevantUsers,
             'calendar_year_form' => $form->createView(),
@@ -92,7 +91,6 @@ class VacationController extends AbstractController
      */
     public function getCalendarInformation(User $currentUser, VacationRepository $vacationRepository, \DateTime $defaultDate): array
     {
-        $this->loadPublicHoliday($defaultDate);
         $relevantUsers = [];
         $relevantUsers[$currentUser->getId()] = $currentUser;
         foreach ($currentUser->getTeams() as $team) {
@@ -125,36 +123,8 @@ class VacationController extends AbstractController
         return array($relevantUsers, $allVacationDays);
     }
 
-    protected function loadPublicHoliday(\DateTime $date): void
-    {
-        if (!empty($this->publicHolidays[$date->format('Y')])) {
-            return;
-        }
-        $file = $this->kernel->getCacheDir() . '/public_holidays_' . $date->format('Y') . '.json';
-        if (!file_exists($file)) {
-            $client = HttpClient::create();
-            $response = $client->request('GET', 'https://feiertage-api.de/api/?jahr=' . $date->format('Y') . '&nur_land=NW');
-            $content = $response->getContent();
-            file_put_contents($file, $content);
-        } else {
-            $content = file_get_contents($file);
-        }
-        if ($content !== false) {
-            $holidays = @json_decode($content, true);
-
-            if (is_array($holidays)) {
-                foreach ($holidays as $name => $holiday) {
-                    if (!empty($holiday['datum'])) {
-                        $this->publicHolidays[$date->format('Y')][$holiday['datum']] = $name;
-                    }
-                }
-            }
-        }
-    }
-
     protected function getHolidayInformation(User $user, VacationRepository $vacationRepository, Request $request, EntityManagerInterface $entityManager, \DateTime $currentYear): array|Response
     {
-        $this->loadPublicHoliday($currentYear);
         $result = [
             'holidays_per_year' => $user->getHolidaysPerYear()
         ];
@@ -215,7 +185,7 @@ class VacationController extends AbstractController
             $period = new DatePeriod($vacation->getStart(), $interval, $end);
             $type = $vacation->isApproved() ? 'days' : 'notApprovedDays';
             foreach ($period as $date) {
-                if ($vacation->getUser()->getWorkHoursForDay($date) && empty($alreadyNoticed[$date->getTimestamp()]) && empty($this->publicHolidays[$date->format('Y')][$date->format('Y-m-d')])) {
+                if ($vacation->getUser()->getWorkHoursForDay($date) && empty($alreadyNoticed[$date->getTimestamp()]) && !$this->publicHoliday->isPublicHoliday($date)) {
                     $$type++;
                     $alreadyNoticed[$date->getTimestamp()] = $date;
                 }
@@ -230,7 +200,6 @@ class VacationController extends AbstractController
 
     protected function getTeamOverview(User $user, VacationRepository $vacationRepository, Request $request, EntityManagerInterface $entityManager, \DateTime $currentYear): array|Response
     {
-        $this->loadPublicHoliday($currentYear);
         $teamOverview = [];
         $approveForm = $this->createForm(VacationApproveForm::class);
         $approveForm->handleRequest($request);
@@ -311,7 +280,7 @@ class VacationController extends AbstractController
                     $interval = new DateInterval('P1D'); // 1 Tag
                     $period = new DatePeriod($vacation->getStart(), $interval, $end);
                     foreach ($period as $date) {
-                        if ($vacation->getUser()->getWorkHoursForDay($date) > 0 && empty($noticedDates[$date->getTimestamp()]) && empty($this->publicHolidays[$date->format('Y')][$date->format('Y-m-d')])) {
+                        if ($vacation->getUser()->getWorkHoursForDay($date) > 0 && empty($noticedDates[$date->getTimestamp()]) && !$this->publicHoliday->isPublicHoliday($date)) {
                             $$mode++;
                             $noticedDates[$date->getTimestamp()] = $date;
                         }
