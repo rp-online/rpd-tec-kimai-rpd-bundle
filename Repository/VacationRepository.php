@@ -64,6 +64,7 @@ class VacationRepository extends ServiceEntityRepository
         $qb->where('v.start <= :end')
             ->andWhere('v.end >= :start')
             ->andWhere('v.user = :user')
+            ->andWhere('v.declined = 0')
             ->setParameter('start', $start)
             ->setParameter('end', $end)
             ->setParameter('user', $user)
