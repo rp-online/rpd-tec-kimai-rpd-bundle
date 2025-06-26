@@ -198,6 +198,9 @@ class SprintUserReport
 
     private function calculatePTI(): self
     {
+        if($this->totalBookedTime <= 0 || $this->targetHours <= 0) {
+            return $this;
+        }
         $efficiencyFactor = (($this->targetHours * $this->query->getPlanFactor()) / 100) / $this->totalBookedTime;
         $actualTicketBookedAndEstimatedTime = [];
         foreach ($this->tickets as $ticket) {
