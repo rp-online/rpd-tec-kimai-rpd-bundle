@@ -12,6 +12,9 @@ namespace KimaiPlugin\RPDBundle\Controller\Reporting;
 use App\Controller\AbstractController;
 use KimaiPlugin\RPDBundle\Reporting\SprintReport\SprintReportForm;
 use KimaiPlugin\RPDBundle\Reporting\SprintReport\SprintReportQuery;
+use KimaiPlugin\RPDBundle\Reporting\SprintUserReport\SprintUserQuery;
+use KimaiPlugin\RPDBundle\Reporting\SprintUserReport\SprintUserReport;
+use KimaiPlugin\RPDBundle\Reporting\SprintUserReport\SprintUserReportForm;
 use KimaiPlugin\RPDBundle\Service\SprintReportService;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -33,6 +36,22 @@ class SprintReportController extends AbstractController
             'report_title' => 'Sprintauswertung',
             'form' => $form,
             ...$reportService->getSprintReportData($query)
+        ]);
+    }
+
+    #[Route(path: '/sprint/user', name: 'report_sprint_user', methods: ['GET', 'POST'])]
+    public function userReport(Request $request, SprintUserReport $userReport): Response
+    {
+        $query = new SprintUserQuery();
+        $query->setUser($this->getUser());
+        $form = $this->createFormForGetRequest(SprintUserReportForm::class, $query);
+        $form->submit($request->query->all(), false);
+        $userReport->setQuery($query)->create();
+
+        return $this->render('@RPD/reporting/report_sprint_user.twig', [
+            'report_title' => 'Sprintauswertung für ' . $query->getUser()->getDisplayName(),
+            'report' => $userReport,
+            'form' => $form
         ]);
     }
 }

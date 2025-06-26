@@ -53,4 +53,24 @@ class VacationExtensionRuntime implements RuntimeExtensionInterface
 
         return $result === 1 ? '1 Tag' : $result . ' Tage';
     }
+
+    public function getHumanTime(int $seconds)
+    {
+        $hours = floor($seconds / 3600);
+        $minutes = floor(($seconds % 3600) / 60);
+        $seconds = $seconds % 60;
+
+        $result = [];
+        if ($hours > 0) {
+            $result[] = sprintf('%d Stunde%s', $hours, $hours > 1 ? 'n' : '');
+        }
+        if ($minutes > 0) {
+            $result[] = sprintf('%d Minute%s', $minutes, $minutes > 1 ? 'n' : '');
+        }
+        if ($seconds > 0) {
+            $result[] = sprintf('%d Sekunde%s', $seconds, $seconds > 1 ? 'n' : '');
+        }
+
+        return implode(', ', $result);
+    }
 }

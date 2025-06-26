@@ -1,0 +1,161 @@
+{% extends 'reporting/layout.html.twig' %}
+{% import "macros/charts.html.twig" as charts %}
+{% import "macros/widgets.html.twig" as widgets %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    {{ encore_entry_link_tags('chart') }}
+{% endblock %}
+
+{% block head %}
+    {{ parent() }}
+    {{ encore_entry_script_tags('chart') }}
+{% endblock %}
+
+{% block report %}
+    <div class="row">
+        <div class="col-12 col-lg-6">
+            <div class="row">
+                <div class="col-12 col-lg-4 col-xl-3">
+
+                    <div class="card mb-3 p-3">
+                        <h4 class="card-title">Focus-Score <i class="fa-regular fa-circle-question" data-toggle="tooltip" title="Dieser Wert zeigt, wie viel Prozent der gesamten Arbeitszeit in diesem Sprint auf Sprint-relevante Tickets gebucht wurden. Ein hoher Fokus-Score bedeutet, dass der Nutzer einen Großteil seiner Zeit auf Aufgaben gearbeitet hat, die direkt zum Sprint-Ziel beitragen. Zeitbuchungen außerhalb von Sprint-Tickets (z. B. Support, Meetings, oder andere Themen) senken den Score."></i></h4>
+                        <p class="card-text fw-bold {% if report.focusScore < 70 %}text-danger{% elseif report.focusScore < 90 %}text-warning{% endif %}">{{ report.focusScore|number_format }} %</p>
+                    </div>
+
+                    <div class="card mb-3 p-3">
+                        <h4 class="card-title">Estimate Accuracy <i class="fa-regular fa-circle-question" data-toggle="tooltip" title="Diese Kennzahl zeigt, wie genau die ursprünglichen Stundenschätzungen für die bearbeiteten Tickets im Sprint eingehalten wurden. Sie berechnet sich aus der durchschnittlichen prozentualen Abweichung zwischen geplanter und tatsächlich geleisteter Zeit."></i></h4>
+                        <p class="card-text fw-bold {% if report.estimateAccuracy < 70 %}text-danger{% elseif report.estimateAccuracy < 90 %}text-warning{% endif %}">{{ report.estimateAccuracy|number_format }}%</p>
+                    </div>
+
+                    <div class="card mb-3 p-3">
+                        <h4 class="card-title">Plan-Treue-Index (PTI) <i class="fa-regular fa-circle-question" data-toggle="tooltip" title="Der Plan-Treue-Index bewertet, wie wirtschaftlich und planungstreu die tatsächlich geleistete Arbeitszeit im Sprint war."></i></h4>
+                        <p class="card-text fw-bold {% if report.pTI < 70 %}text-danger{% elseif report.pTI < 90 %}text-warning{% endif %}">{{ report.pTI|number_format }}%</p>
+                    </div>
+                </div>
+                <div class="col-12 col-lg-8 col-xl-9">
+                    <div class="card mb-3 p-3">
+                        <h4 class="card-title">KPIs</h4>
+                        <div class="card-body p-0">
+                            <table class="table table-hover">
+                                <tbody>
+                                <tr>
+                                    <th class="fw-bold">Anzahl bearbeiteter Tickets</th>
+                                    <td class="text-end">{{ report.totalTickets }}</td>
+                                </tr>
+                                <tr>
+                                    <th class="fw-bold">Insgesamt verfügbare Stunden</th>
+                                    <td class="text-end">{{ report.totalHours }}</td>
+                                </tr>
+                                <tr>
+                                    <th class="fw-bold">Geplante Stunden</th>
+                                    <td class="text-end">{{ report.targetHours }}</td>
+                                </tr>
+                                <tr>
+                                    <th class="fw-bold">Gebuchte Stunden</th>
+                                    <td class="text-end">{{ report.bookedHours }}</td>
+                                </tr>
+                                <tr>
+                                    <th class="fw-bold">Gebuchte Stunden auf Tickets</th>
+                                    <td class="text-end">{{ report.bookedHoursOnTickets }}</td>
+                                </tr>
+                                <tr>
+                                    <th class="fw-bold">Beendete Tickets</th>
+                                    <td class="text-end">{{ report.finishedTickets }}</td>
+                                </tr>
+                                <tr>
+                                    <th class="fw-bold">In Tickets unterstützt</th>
+                                    <td class="text-end">{{ report.supportedTickets }}</td>
+                                </tr>
+                                <tr>
+                                    <th class="fw-bold">Anzahl mitgenommener Tickets</th>
+                                    <td class="text-end">{{ report.loopedTickets }}</td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-lg-6">
+            <div class="card mb-3 p-3">
+                <h4 class="card-title">Übersicht</h4>
+                <div class="card-body">
+                    {{ charts.doughnut_chart('sprint_doughnut', report.getOverviewChart().labels, report.getOverviewChart().values) }}
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12 col-lg-6">
+            <div class="card mb-3 p-3">
+                <h4 class="card-title">Alle Tickets</h4>
+                <div class="card-body">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th style="width: 10%">Ticket-Nr</th>
+                                <th style="width: 25%">Titel</th>
+                                <th class="text-center">Status</th>
+                                <th class="text-center">Bearbeiter</th>
+                                <th class="text-center">Gebucht</th>
+                                <th class="text-center">Geschätzt</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for ticket in report.allTickets %}
+                                <tr>
+                                    <td>{{ ticket.id }}</td>
+                                    <td>{{ ticket.title }}</td>
+                                    <td class="text-center"><span class="badge text-bg-secondary">{{ ticket.status }}</span></td>
+                                    <td class="text-center">{{ ticket.assignee }}</td>
+                                    <td class="text-center">{{ ticket.total_time_spent|human_time }}</td>
+                                    <td class="text-center">{{ ticket.estimate|human_time }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-lg-6">
+            <div class="card mb-3 p-3">
+                <h4 class="card-title">Tickets aus vorherigen Sprints</h4>
+                <div class="card-body">
+                    <table class="table table-hover">
+                        <thead>
+                        <tr>
+                            <th style="width: 10%">Ticket-Nr</th>
+                            <th style="width: 25%">Titel</th>
+                            <th class="text-center">Status</th>
+                            <th class="text-center">Bearbeiter</th>
+                            <th class="text-center">Gebucht</th>
+                            <th class="text-center">Geschätzt</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for ticket in report.loopedTickets %}
+                            <tr>
+                                <td>{{ ticket.id }}</td>
+                                <td>{{ ticket.title }}</td>
+                                <td class="text-center"><span class="badge text-bg-secondary">{{ ticket.status }}</span></td>
+                                <td class="text-center">{{ ticket.assignee }}</td>
+                                <td class="text-center">{{ ticket.total_time_spent|human_time }}</td>
+                                <td class="text-center">{{ ticket.estimate|human_time }}</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    {% set doughnutOptions = {'label': 'duration', 'title': 'name'} %}
+    {{ charts.doughnut_javascript(doughnutOptions) }}
+{% endblock %}
