@@ -191,6 +191,11 @@ class SprintUserReport
         return $this;
     }
 
+    private function getColor(): string
+    {
+        return sprintf('#%06X', mt_rand(0, 0xFFFFFF));
+    }
+
     private function calculatePTI(): self
     {
         $efficiencyFactor = (($this->targetHours * $this->query->getPlanFactor()) / 100) / $this->totalBookedTime;
