@@ -355,7 +355,8 @@ class SprintUserReport
             'code_owner' => $issue['fields']['customfield_13302']['displayName'] ?? 'unknown',
             'total_time_spent' => $issue['fields']['progress']['total'] ?? 0,
             'labels' => $issue['fields']['labels'] ?? [],
-            'time_spent_from_user' => 0,
+            'time_spent_from_user_total' => 0,
+            'time_spent_from_user_in_sprint' => 0,
             'estimate' => $issue['fields']['timeoriginalestimate'] ?? 0,
         ];
         $workLogArray = $this->loadWorkLogOfTicket($result['id']);
@@ -373,7 +374,11 @@ class SprintUserReport
                 $workLog['author']['emailAddress'] === $this->query->getUser()?->getEmail()
                 || $workLog['author']['displayName'] === $this->query->getUser()?->getDisplayName()
             ) {
-                $result['time_spent_from_user'] += $workLog['timeSpentSeconds'] ?? 0;
+                $result['time_spent_from_user_total'] += $workLog['timeSpentSeconds'] ?? 0;
+                $created = new \DateTime($workLog['created'] ?? 'now');
+                if($created >= $this->query->getCurrentSprint()->getBegin() && $created <= $this->query->getCurrentSprint()->getEnd()) {
+                    $result['time_spent_from_user_in_sprint'] += $workLog['timeSpentSeconds'] ?? 0;
+                }
             }
         }
 

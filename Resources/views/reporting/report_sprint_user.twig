@@ -101,6 +101,7 @@
                             <th class="text-center">Status</th>
                             <th class="text-center">Bearbeiter</th>
                             <th class="text-center">Gesamt gebucht</th>
+                            <th class="text-center">Vom Nutzer gebucht</th>
                             <th class="text-center">Vom Nutzer gebucht (im aktuellen Zeitraum)</th>
                             <th class="text-center">Geschätzt</th>
                         </tr>
@@ -113,7 +114,8 @@
                                 <td class="text-center"><span class="badge text-bg-secondary">{{ ticket.status }}</span></td>
                                 <td class="text-center">{{ ticket.assignee }}</td>
                                 <td class="text-center">{{ ticket.total_time_spent|human_time }}</td>
-                                <td class="text-center">{{ ticket.time_spent_from_user|human_time }}</td>
+                                <td class="text-center">{{ ticket.time_spent_from_user_total|human_time }}</td>
+                                <td class="text-center">{{ ticket.time_spent_from_user_in_sprint|human_time }}</td>
                                 <td class="text-center">{{ ticket.estimate|human_time }}</td>
                             </tr>
                         {% endfor %}
@@ -134,6 +136,7 @@
                                 <th class="text-center">Status</th>
                                 <th class="text-center">Bearbeiter</th>
                                 <th class="text-center">Gesamt gebucht</th>
+                                <th class="text-center">Vom Nutzer gebucht</th>
                                 <th class="text-center">Vom Nutzer gebucht (im aktuellen Zeitraum)</th>
                                 <th class="text-center">Geschätzt</th>
                             </tr>
@@ -146,7 +149,8 @@
                                     <td class="text-center"><span class="badge text-bg-secondary">{{ ticket.status }}</span></td>
                                     <td class="text-center">{{ ticket.assignee }}</td>
                                     <td class="text-center">{{ ticket.total_time_spent|human_time }}</td>
-                                    <td class="text-center">{{ ticket.time_spent_from_user|human_time }}</td>
+                                    <td class="text-center">{{ ticket.time_spent_from_user_total|human_time }}</td>
+                                    <td class="text-center">{{ ticket.time_spent_from_user_in_sprint|human_time }}</td>
                                     <td class="text-center">{{ ticket.estimate|human_time }}</td>
                                 </tr>
                             {% endfor %}
