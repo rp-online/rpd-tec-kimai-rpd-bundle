@@ -154,7 +154,7 @@ class SprintUserReport
             foreach ($labels as $label) {
                 $matches = [];
                 if (preg_match("/RPD-KW(?<kw>[\d]{2})-(?<year>[\d]{2})/", $label, $matches)) {
-                    if (!empty($matches['kw']) || !empty($matches['year'])) {
+                    if (empty($matches['kw']) || empty($matches['year'])) {
                         continue;
                     }
                     if ($matches['kw'] < $currentWeek && $matches['year'] <= $year) {
@@ -167,7 +167,7 @@ class SprintUserReport
                 }
             }
             if ($earliestSprint['year'] < 2100) {
-                $ticket['earliest_sprint'] = 'RPD-KW' . $earliestSprint['kw'] . '-' . $earliestSprint['year'];
+                $ticket['earliest_sprint'] = 'RPD-KW' . $earliestSprint['week'] . '-' . $earliestSprint['year'];
             }
         }
 

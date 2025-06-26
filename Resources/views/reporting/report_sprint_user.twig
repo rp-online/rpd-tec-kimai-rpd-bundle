@@ -107,7 +107,7 @@
                         </tr>
                         </thead>
                         <tbody>
-                        {% for ticket in report.loopedTickets %}
+                        {% for ticket in report.allLoopedTickets %}
                             <tr>
                                 <td><a href="https://promgm.atlassian.net/browse/{{ ticket.id }}" target="_blank">{{ ticket.id }}</a></td>
                                 <td>{{ ticket.title }}</td>
