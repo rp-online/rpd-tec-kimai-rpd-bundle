@@ -89,38 +89,7 @@
         </div>
     </div>
     <div class="row">
-        <div class="col-12 col-lg-6">
-            <div class="card mb-3 p-3">
-                <h4 class="card-title">Alle Tickets</h4>
-                <div class="card-body">
-                    <table class="table table-hover">
-                        <thead>
-                            <tr>
-                                <th style="width: 10%">Ticket-Nr</th>
-                                <th style="width: 25%">Titel</th>
-                                <th class="text-center">Status</th>
-                                <th class="text-center">Bearbeiter</th>
-                                <th class="text-center">Gebucht</th>
-                                <th class="text-center">Geschätzt</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for ticket in report.allTickets %}
-                                <tr>
-                                    <td>{{ ticket.id }}</td>
-                                    <td>{{ ticket.title }}</td>
-                                    <td class="text-center"><span class="badge text-bg-secondary">{{ ticket.status }}</span></td>
-                                    <td class="text-center">{{ ticket.assignee }}</td>
-                                    <td class="text-center">{{ ticket.total_time_spent|human_time }}</td>
-                                    <td class="text-center">{{ ticket.estimate|human_time }}</td>
-                                </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-        <div class="col-12 col-lg-6">
+        <div class="col-12">
             <div class="card mb-3 p-3">
                 <h4 class="card-title">Tickets aus vorherigen Sprints</h4>
                 <div class="card-body">
@@ -146,6 +115,37 @@
                                 <td class="text-center">{{ ticket.estimate|human_time }}</td>
                             </tr>
                         {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="col-12">
+            <div class="card mb-3 p-3">
+                <h4 class="card-title">Alle Tickets</h4>
+                <div class="card-body">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th style="width: 10%">Ticket-Nr</th>
+                                <th style="width: 25%">Titel</th>
+                                <th class="text-center">Status</th>
+                                <th class="text-center">Bearbeiter</th>
+                                <th class="text-center">Gebucht</th>
+                                <th class="text-center">Geschätzt</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for ticket in report.allTickets %}
+                                <tr>
+                                    <td>{{ ticket.id }}</td>
+                                    <td>{{ ticket.title }}</td>
+                                    <td class="text-center"><span class="badge text-bg-secondary">{{ ticket.status }}</span></td>
+                                    <td class="text-center">{{ ticket.assignee }}</td>
+                                    <td class="text-center">{{ ticket.total_time_spent|human_time }}</td>
+                                    <td class="text-center">{{ ticket.estimate|human_time }}</td>
+                                </tr>
+                            {% endfor %}
                         </tbody>
                     </table>
                 </div>
