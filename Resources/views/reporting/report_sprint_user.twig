@@ -92,7 +92,7 @@
         <div class="col-12">
             <div class="card mb-3 p-3">
                 <h4 class="card-title">Tickets aus vorherigen Sprints</h4>
-                <div class="card-body">
+                <div class="card-body p-0">
                     <table class="table table-hover">
                         <thead>
                         <tr>
@@ -107,7 +107,7 @@
                         <tbody>
                         {% for ticket in report.loopedTickets %}
                             <tr>
-                                <td>{{ ticket.id }}</td>
+                                <td><a href="https://promgm.atlassian.net/browse/{{ ticket.id }}" target="_blank">{{ ticket.id }}</a></td>
                                 <td>{{ ticket.title }}</td>
                                 <td class="text-center"><span class="badge text-bg-secondary">{{ ticket.status }}</span></td>
                                 <td class="text-center">{{ ticket.assignee }}</td>
@@ -123,7 +123,7 @@
         <div class="col-12">
             <div class="card mb-3 p-3">
                 <h4 class="card-title">Alle Tickets</h4>
-                <div class="card-body">
+                <div class="card-body p-0">
                     <table class="table table-hover">
                         <thead>
                             <tr>
@@ -138,7 +138,7 @@
                         <tbody>
                             {% for ticket in report.allTickets %}
                                 <tr>
-                                    <td>{{ ticket.id }}</td>
+                                    <td><a href="https://promgm.atlassian.net/browse/{{ ticket.id }}" target="_blank">{{ ticket.id }}</a></td>
                                     <td>{{ ticket.title }}</td>
                                     <td class="text-center"><span class="badge text-bg-secondary">{{ ticket.status }}</span></td>
                                     <td class="text-center">{{ ticket.assignee }}</td>
