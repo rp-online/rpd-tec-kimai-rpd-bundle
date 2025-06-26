@@ -13,6 +13,7 @@ use App\Configuration\SystemConfiguration;
 use App\Entity\TimesheetMeta;
 use App\Event\TimesheetCreatePostEvent;
 use App\Event\TimesheetMetaDefinitionEvent;
+use App\Event\TimesheetStopPostEvent;
 use App\Event\TimesheetUpdatePostEvent;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -38,6 +39,7 @@ class TimesheetSubscriber implements EventSubscriberInterface
             TimesheetMetaDefinitionEvent::class => ['loadMeta', 200],
             TimesheetCreatePostEvent::class => ['addJiraWorklog', 200],
             TimesheetUpdatePostEvent::class => ['updateJiraWorklog', 200],
+            TimesheetStopPostEvent::class => ['updateJiraWorklog', 200],
         ];
     }
 
@@ -55,7 +57,7 @@ class TimesheetSubscriber implements EventSubscriberInterface
     /**
      * @throws TransportExceptionInterface
      */
-    public function updateJiraWorklog(TimesheetUpdatePostEvent $event): void
+    public function updateJiraWorklog(TimesheetUpdatePostEvent|TimesheetStopPostEvent $event): void
     {
         $worklogId = $event->getTimesheet()->getMetaField('worklog_id')?->getValue();
         $user = $event->getTimesheet()->getUser();
@@ -109,9 +111,9 @@ class TimesheetSubscriber implements EventSubscriberInterface
         }
     }
 
-    public function createWorklog(string $jiraUrl, string $jiraUsername, string $jiraPassword, TimesheetCreatePostEvent|TimesheetUpdatePostEvent $event, string $ticket): void
+    public function createWorklog(string $jiraUrl, string $jiraUsername, string $jiraPassword, TimesheetCreatePostEvent|TimesheetUpdatePostEvent|TimesheetStopPostEvent $event, string $ticket): void
     {
-        if (!empty($jiraUrl) && !empty($jiraUsername) && !empty($jiraPassword)) {
+        if (!empty($jiraUrl) && !empty($jiraUsername) && !empty($jiraPassword) && !empty($event->getTimesheet()->getEnd())) {
             $body = [
                 'comment' => $event->getTimesheet()->getActivity()?->getName() . ': ' . $event->getTimesheet()->getDescription(),
                 'started' => preg_replace("/([\d]{2})(:)([\d]{2})$/", '$1$3', (string) $event->getTimesheet()->getBegin()?->format(DATE_RFC3339_EXTENDED)),
