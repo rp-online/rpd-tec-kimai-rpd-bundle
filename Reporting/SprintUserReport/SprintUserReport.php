@@ -7,6 +7,7 @@ use App\Entity\Timesheet;
 use Doctrine\ORM\EntityManagerInterface;
 use KimaiPlugin\RPDBundle\Repository\ExtendedTimesheetRepository;
 use KimaiPlugin\RPDBundle\Vacation\PublicHoliday;
+use KimaiPlugin\RPDBundle\Vacation\VacationService;
 use Symfony\Component\HttpClient\HttpClient;
 
 class SprintUserReport
@@ -31,7 +32,8 @@ class SprintUserReport
     public function __construct(
         private readonly EntityManagerInterface $entityManager,
         private readonly SystemConfiguration    $systemConfiguration,
-        private readonly PublicHoliday          $publicHoliday
+        private readonly PublicHoliday          $publicHoliday,
+        private readonly VacationService        $vacationService
     )
     {
         $this->repository = $this->getRepository();
@@ -201,7 +203,7 @@ class SprintUserReport
         if($this->totalBookedTime <= 0 || $this->targetHours <= 0) {
             return $this;
         }
-        $efficiencyFactor = (($this->targetHours * $this->query->getPlanFactor()) / 100) / $this->totalBookedTime;
+        $efficiencyFactor = (($this->targetHours * $this->query->getPlanFactor()) / 100) / $this->bookedTimeOnTickets;
         $actualTicketBookedAndEstimatedTime = [];
         foreach ($this->tickets as $ticket) {
             if (empty($ticket['estimate']) || $ticket['estimate'] <= 0) {
@@ -254,7 +256,7 @@ class SprintUserReport
     private function calculateFinishedTickets(): self
     {
         foreach ($this->tickets as $ticket) {
-            $openTicketStatuses = ['Offen', 'In Arbeit', 'Fertig zur Umsetzung', 'Fertig zur Beauftragung', 'Bereit für Code Review', 'Refinement', 'Code Review', 'PO Backlog refined', 'Sprint Backlog'];
+            $openTicketStatuses = ['Offen', 'In Arbeit', 'Fertig zur Umsetzung', 'Fertig zur Beauftragung', 'Bereit für Code Review', 'Refinement', 'Code Review', 'Planung', 'PO Backlog refined', 'Sprint Backlog', 'Dev-Refinement'];
             if (empty($ticket['status']) || in_array($ticket['status'], $openTicketStatuses, true)) {
                 continue;
             }
@@ -268,19 +270,36 @@ class SprintUserReport
     {
         $currentSprintDateRange = $this->query->getCurrentSprint();
         $start = $currentSprintDateRange->getBegin();
-        $end = $currentSprintDateRange->getEnd();
+        $end = clone $currentSprintDateRange->getEnd();
         if (empty($start) || empty($end)) {
             return $this;
         }
-        $interval = new \DateInterval('P1D'); // 1 day
-        $period = new \DatePeriod($start, $interval, $end->modify('+1 day'));
         $user = $this->query->getUser();
         if (empty($user)) {
             return $this;
         }
-        foreach ($period as $date) {
-            if ($user->getWorkHoursForDay($date) > 0 && !$this->publicHoliday->isPublicHoliday($date)) {
+        if($start->format('d.m.Y') === $end->format('d.m.Y')) {
+            $date = $start;
+            if (
+                $user->getWorkHoursForDay($date) > 0
+                && !$this->publicHoliday->isPublicHoliday($date)
+                && $date <= (new \DateTime('now'))
+                && !$this->vacationService->hasVacation($user, $date)
+            ) {
                 $this->targetHours += $user->getWorkHoursForDay($date);
+            }
+        } else {
+            $interval = new \DateInterval('P1D'); // 1 day
+            $period = new \DatePeriod($start, $interval, $end->modify('+1 day'));
+            foreach ($period as $date) {
+                if (
+                    $user->getWorkHoursForDay($date) > 0
+                    && !$this->publicHoliday->isPublicHoliday($date)
+                    && $date <= (new \DateTime('now'))
+                    && !$this->vacationService->hasVacation($user, $date)
+                ) {
+                    $this->targetHours += $user->getWorkHoursForDay($date);
+                }
             }
         }
 

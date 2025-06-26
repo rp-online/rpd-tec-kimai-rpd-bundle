@@ -57,7 +57,7 @@ class VacationRepository extends ServiceEntityRepository
             ->getQuery()->getResult();
     }
 
-    public function checkIfOverlapped(\DateTime $start, \DateTime $end, User $user): bool
+    public function checkIfOverlapped(\DateTime $start, \DateTime $end, User $user, bool $onlyApproved = false): bool
     {
         $qb = $this->createQueryBuilder('v');
 
@@ -69,6 +69,9 @@ class VacationRepository extends ServiceEntityRepository
             ->setParameter('end', $end)
             ->setParameter('user', $user)
         ;
+        if($onlyApproved) {
+            $qb->andWhere('v.approved = 1');
+        }
 
         return count($qb->getQuery()->getResult()) > 0;
     }
