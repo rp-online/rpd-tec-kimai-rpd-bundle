@@ -104,6 +104,7 @@
                             <th class="text-center">Vom Nutzer gebucht</th>
                             <th class="text-center">Vom Nutzer gebucht (im aktuellen Zeitraum)</th>
                             <th class="text-center">Geschätzt</th>
+                            <th class="text-center">Erstmalig im Sprint</th>
                         </tr>
                         </thead>
                         <tbody>
@@ -117,6 +118,7 @@
                                 <td class="text-center">{{ ticket.time_spent_from_user_total|human_time }}</td>
                                 <td class="text-center">{{ ticket.time_spent_from_user_in_sprint|human_time }}</td>
                                 <td class="text-center">{{ ticket.estimate|human_time }}</td>
+                                <td class="text-center">{{ ticket.earliest_sprint }}</td>
                             </tr>
                         {% endfor %}
                         </tbody>
